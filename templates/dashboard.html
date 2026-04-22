@@ -15,6 +15,62 @@
             border-bottom: 3px solid #4CAF50;
             padding-bottom: 10px;
         }
+        .filter-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-form h2 {
+            margin-top: 0;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .filter-group select,
+        .filter-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button, a.reset-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            display: inline-block;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a.reset-btn {
+            background-color: #808080;
+        }
+        a.reset-btn:hover {
+            background-color: #707070;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -27,7 +83,6 @@
             padding: 12px;
             text-align: left;
             font-weight: bold;
-            border-bottom: 2px solid #45a049;
         }
         td {
             padding: 10px 12px;
@@ -43,6 +98,91 @@
 </head>
 <body>
     <h1>Dashboard Ptáci</h1>
+    
+    <div class="filter-form">
+        <h2>Filtry</h2>
+        <form method="GET" action="/">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="rad">Řád:</label>
+                    <select name="rad" id="rad">
+                        <option value="">-- Vše --</option>
+                        {% for r in filter_options.rady %}
+                        <option value="{{ r }}" {% if params.get('rad') == r %}selected{% endif %}>{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="celed">Čeleď:</label>
+                    <select name="celed" id="celed">
+                        <option value="">-- Vše --</option>
+                        {% for c in filter_options.celedi %}
+                        <option value="{{ c }}" {% if params.get('celed') == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="typ_potravy">Potrava:</label>
+                    <select name="typ_potravy" id="typ_potravy">
+                        <option value="">-- Vše --</option>
+                        {% for p in filter_options.potravy %}
+                        <option value="{{ p }}" {% if params.get('typ_potravy') == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="kontinent">Kontinent:</label>
+                    <select name="kontinent" id="kontinent">
+                        <option value="">-- Vše --</option>
+                        {% for k in filter_options.kontinenty %}
+                        <option value="{{ k }}" {% if params.get('kontinent') == k %}selected{% endif %}>{{ k }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="migrace">Migrace:</label>
+                    <select name="migrace" id="migrace">
+                        <option value="">-- Vše --</option>
+                        <option value="1" {% if params.get('migrace') == '1' %}selected{% endif %}>Tažný</option>
+                        <option value="0" {% if params.get('migrace') == '0' %}selected{% endif %}>Netažný</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <select name="status" id="status">
+                        <option value="">-- Vše --</option>
+                        {% for s in filter_options.stavy %}
+                        <option value="{{ s }}" {% if params.get('status') == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="hmotnost_min">Hmotnost min (g):</label>
+                    <input type="number" name="hmotnost_min" id="hmotnost_min" step="0.1" value="{{ params.get('hmotnost_min', '') }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="hmotnost_max">Hmotnost max (g):</label>
+                    <input type="number" name="hmotnost_max" id="hmotnost_max" step="0.1" value="{{ params.get('hmotnost_max', '') }}">
+                </div>
+            </div>
+            
+            <div class="filter-buttons">
+                <button type="submit">Filtrovat</button>
+                <a href="/" class="reset-btn">Resetovat</a>
+            </div>
+        </form>
+    </div>
     
     <table>
         <thead>
@@ -78,6 +218,10 @@
                 <td>{% if ptak['migrace'] %}Ano{% else %}Ne{% endif %}</td>
                 <td>{{ ptak['kontinent'] }}</td>
                 <td>{{ ptak['snuska'] }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="13" style="text-align: center; padding: 20px;">Žádné ptáky neodpovídají kritériím filtrování.</td>
             </tr>
             {% endfor %}
         </tbody>
