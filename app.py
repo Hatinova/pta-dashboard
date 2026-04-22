@@ -4,6 +4,14 @@ import os
 
 app = Flask(__name__)
 
+# Povolené sloupce pro řazení (ochrana proti SQL injection)
+ALLOWED_SORT_COLUMNS = {
+    "nazev", "vedecky_nazev", "rad", "celed",
+    "delka", "rozpeti", "hmotnost",
+    "status", "potrava", "migrace",
+    "kontinent", "snuska",
+}
+
 def get_db():
     """Otevře spojení na databázi ptaci.db a nastaví row_factory."""
     db = sqlite3.connect('ptaci.db')
@@ -78,6 +86,23 @@ def get_filter_options(conn):
     
     return options
 
+def validate_sort_params(razeni, smer):
+    """
+    Validuje parametry pro řazení.
+    Vrací tuple (razeni, smer) s bezpečnými hodnotami.
+    """
+    # Validace sloupce - pokud není v povolené množině, použij výchozí
+    if razeni not in ALLOWED_SORT_COLUMNS:
+        razeni = 'nazev'
+    
+    # Validace směru - povoleno jen ASC nebo DESC
+    if smer.upper() not in ('ASC', 'DESC'):
+        smer = 'ASC'
+    else:
+        smer = smer.upper()
+    
+    return razeni, smer
+
 @app.route('/')
 def dashboard():
     db = get_db()
@@ -92,17 +117,22 @@ def dashboard():
     # Sestavení WHERE klauzule
     where_clause, values = build_query(params)
     
+    # Validace a získání parametrů řazení
+    razeni = params.get('razeni', 'nazev')
+    smer = params.get('smer', 'ASC')
+    razeni, smer = validate_sort_params(razeni, smer)
+    
     # Sestavení SQL dotazu
     if where_clause:
-        query = f'SELECT * FROM ptaci WHERE {where_clause} ORDER BY nazev ASC'
+        query = f'SELECT * FROM ptaci WHERE {where_clause} ORDER BY {razeni} {smer}'
     else:
-        query = 'SELECT * FROM ptaci ORDER BY nazev ASC'
+        query = f'SELECT * FROM ptaci ORDER BY {razeni} {smer}'
     
     cursor.execute(query, values)
     ptaci = cursor.fetchall()
     db.close()
     
-    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params)
+    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params, razeni=razeni, smer=smer)
 
 if __name__ == '__main__':
     app.run(debug=True)
