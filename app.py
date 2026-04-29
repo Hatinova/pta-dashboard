@@ -122,6 +122,23 @@ def dashboard():
     smer = params.get('smer', 'ASC')
     razeni, smer = validate_sort_params(razeni, smer)
     
+    # Agregační dotaz pro statistiky
+    stats_query = '''
+        SELECT
+            COUNT(*) as pocet,
+            ROUND(AVG(delka_cm), 1) as prum_delka,
+            MAX(hmotnost_g) as max_hmotnost,
+            MIN(hmotnost_g) as min_hmotnost,
+            ROUND(AVG(hmotnost_g), 1) as prum_hmotnost,
+            ROUND(AVG(rozpeti_cm), 1) as prum_rozpeti
+        FROM ptaci
+    '''
+    if where_clause:
+        stats_query += f' WHERE {where_clause}'
+    
+    cursor.execute(stats_query, values)
+    stats = cursor.fetchone()
+    
     # Sestavení SQL dotazu
     if where_clause:
         query = f'SELECT * FROM ptaci WHERE {where_clause} ORDER BY {razeni} {smer}'
@@ -132,7 +149,7 @@ def dashboard():
     ptaci = cursor.fetchall()
     db.close()
     
-    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params, razeni=razeni, smer=smer)
+    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params, razeni=razeni, smer=smer, stats=stats)
 
 if __name__ == '__main__':
     app.run(debug=True)
