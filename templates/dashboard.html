@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Ptáci</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,6 +76,22 @@
             font-size: 2em;
             font-weight: bold;
             color: #4CAF50;
+        }
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-card h3 {
+            margin: 0 0 20px 0;
+            color: #333;
         }
         button, a.reset-btn {
             padding: 10px 20px;
@@ -250,6 +267,107 @@
             <div class="stat-value">{{ stats['max_hmotnost'] or '-' }} g</div>
         </div>
     </div>
+    
+    <div class="charts-section">
+        <div class="chart-card">
+            <h3>Druhy podle řádu</h3>
+            <canvas id="chartRad"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Tažní vs. netažní</h3>
+            <canvas id="chartMigrace"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Průměrná hmotnost podle potravy</h3>
+            <canvas id="chartPotrava"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Druhy podle kontinentu</h3>
+            <canvas id="chartKontinent"></canvas>
+        </div>
+    </div>
+    
+    <script>
+        // Graf: Druhy podle řádu
+        new Chart(document.getElementById('chartRad'), {
+            type: 'bar',
+            data: {
+                labels: {{ graf_rad_labels|tojson }},
+                datasets: [{
+                    label: 'Počet druhů',
+                    data: {{ graf_rad_data|tojson }},
+                    backgroundColor: '#2d6a4f',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+        
+        // Graf: Tažní vs. netažní
+        new Chart(document.getElementById('chartMigrace'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ migrace_labels|tojson }},
+                datasets: [{
+                    data: {{ migrace_data|tojson }},
+                    backgroundColor: ['#2d6a4f', '#52b788'],
+                    borderRadius: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: true } }
+            }
+        });
+        
+        // Graf: Hmotnost podle potravy
+        new Chart(document.getElementById('chartPotrava'), {
+            type: 'bar',
+            data: {
+                labels: {{ graf_potrava_labels|tojson }},
+                datasets: [{
+                    label: 'Průměrná hmotnost (g)',
+                    data: {{ graf_potrava_data|tojson }},
+                    backgroundColor: '#40916c',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        
+        // Graf: Druhy podle kontinentu
+        new Chart(document.getElementById('chartKontinent'), {
+            type: 'bar',
+            data: {
+                labels: {{ graf_kontinent_labels|tojson }},
+                datasets: [{
+                    label: 'Počet druhů',
+                    data: {{ graf_kontinent_data|tojson }},
+                    backgroundColor: '#52b788',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    </script>
     
     <table>
         <thead>

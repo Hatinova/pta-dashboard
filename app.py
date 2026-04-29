@@ -139,6 +139,44 @@ def dashboard():
     cursor.execute(stats_query, values)
     stats = cursor.fetchone()
     
+    # Dotazy pro grafy
+    # 1. Druhy podle řádu
+    druhy_rad = cursor.execute(
+        f'SELECT rad, COUNT(*) as pocet FROM ptaci {("WHERE " + where_clause) if where_clause else ""} GROUP BY rad ORDER BY pocet DESC',
+        values
+    ).fetchall()
+    
+    # 2. Průměrná hmotnost podle typu potravy
+    hmotnost_potrava = cursor.execute(
+        f'SELECT typ_potravy, ROUND(AVG(hmotnost_g), 0) as prum FROM ptaci {("WHERE " + where_clause) if where_clause else ""} GROUP BY typ_potravy ORDER BY prum DESC',
+        values
+    ).fetchall()
+    
+    # 3. Tažní vs. netažní
+    migrace = cursor.execute(
+        f'SELECT migrace, COUNT(*) as pocet FROM ptaci {("WHERE " + where_clause) if where_clause else ""} GROUP BY migrace',
+        values
+    ).fetchall()
+    
+    # 4. Druhy podle kontinentu
+    druhy_kontinent = cursor.execute(
+        f'SELECT vyskyt_kontinent, COUNT(*) as pocet FROM ptaci {("WHERE " + where_clause) if where_clause else ""} GROUP BY vyskyt_kontinent ORDER BY pocet DESC',
+        values
+    ).fetchall()
+    
+    # Příprava dat pro grafy
+    graf_rad_labels = [r['rad'] for r in druhy_rad]
+    graf_rad_data = [r['pocet'] for r in druhy_rad]
+    
+    graf_potrava_labels = [r['typ_potravy'] for r in hmotnost_potrava]
+    graf_potrava_data = [r['prum'] for r in hmotnost_potrava]
+    
+    migrace_labels = ['Tažný' if r['migrace'] else 'Netažný' for r in migrace]
+    migrace_data = [r['pocet'] for r in migrace]
+    
+    graf_kontinent_labels = [r['vyskyt_kontinent'] for r in druhy_kontinent]
+    graf_kontinent_data = [r['pocet'] for r in druhy_kontinent]
+    
     # Sestavení SQL dotazu
     if where_clause:
         query = f'SELECT * FROM ptaci WHERE {where_clause} ORDER BY {razeni} {smer}'
@@ -149,7 +187,11 @@ def dashboard():
     ptaci = cursor.fetchall()
     db.close()
     
-    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params, razeni=razeni, smer=smer, stats=stats)
+    return render_template('dashboard.html', ptaci=ptaci, filter_options=filter_options, params=params, razeni=razeni, smer=smer, stats=stats, 
+                         graf_rad_labels=graf_rad_labels, graf_rad_data=graf_rad_data,
+                         graf_potrava_labels=graf_potrava_labels, graf_potrava_data=graf_potrava_data,
+                         migrace_labels=migrace_labels, migrace_data=migrace_data,
+                         graf_kontinent_labels=graf_kontinent_labels, graf_kontinent_data=graf_kontinent_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
