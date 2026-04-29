@@ -7,9 +7,9 @@ app = Flask(__name__)
 # Povolené sloupce pro řazení (ochrana proti SQL injection)
 ALLOWED_SORT_COLUMNS = {
     "nazev", "vedecky_nazev", "rad", "celed",
-    "delka", "rozpeti", "hmotnost",
-    "status", "potrava", "migrace",
-    "kontinent", "snuska",
+    "delka_cm", "rozpeti_cm", "hmotnost_g",
+    "status_ohrozeni", "typ_potravy", "migrace",
+    "vyskyt_kontinent", "snuska_ks",
 }
 
 def get_db():
@@ -35,27 +35,27 @@ def build_query(params):
         values.append(params.get('celed'))
     
     if params.get('typ_potravy'):
-        conditions.append('potrava = ?')
+        conditions.append('typ_potravy = ?')
         values.append(params.get('typ_potravy'))
     
-    if params.get('kontinent'):
-        conditions.append('kontinent = ?')
-        values.append(params.get('kontinent'))
+    if params.get('vyskyt_kontinent'):
+        conditions.append('vyskyt_kontinent = ?')
+        values.append(params.get('vyskyt_kontinent'))
     
     if params.get('migrace') is not None and params.get('migrace') != '':
         conditions.append('migrace = ?')
         values.append(int(params.get('migrace')))
     
-    if params.get('status'):
-        conditions.append('status = ?')
-        values.append(params.get('status'))
+    if params.get('status_ohrozeni'):
+        conditions.append('status_ohrozeni = ?')
+        values.append(params.get('status_ohrozeni'))
     
     if params.get('hmotnost_min'):
-        conditions.append('hmotnost >= ?')
+        conditions.append('hmotnost_g >= ?')
         values.append(float(params.get('hmotnost_min')))
     
     if params.get('hmotnost_max'):
-        conditions.append('hmotnost <= ?')
+        conditions.append('hmotnost_g <= ?')
         values.append(float(params.get('hmotnost_max')))
     
     where_clause = ' AND '.join(conditions) if conditions else ''
@@ -75,14 +75,14 @@ def get_filter_options(conn):
     cursor.execute('SELECT DISTINCT celed FROM ptaci ORDER BY celed')
     options['celedi'] = [row['celed'] for row in cursor.fetchall() if row['celed']]
     
-    cursor.execute('SELECT DISTINCT potrava FROM ptaci ORDER BY potrava')
-    options['potravy'] = [row['potrava'] for row in cursor.fetchall() if row['potrava']]
+    cursor.execute('SELECT DISTINCT typ_potravy FROM ptaci ORDER BY typ_potravy')
+    options['potravy'] = [row['typ_potravy'] for row in cursor.fetchall() if row['typ_potravy']]
     
-    cursor.execute('SELECT DISTINCT kontinent FROM ptaci ORDER BY kontinent')
-    options['kontinenty'] = [row['kontinent'] for row in cursor.fetchall() if row['kontinent']]
+    cursor.execute('SELECT DISTINCT vyskyt_kontinent FROM ptaci ORDER BY vyskyt_kontinent')
+    options['kontinenty'] = [row['vyskyt_kontinent'] for row in cursor.fetchall() if row['vyskyt_kontinent']]
     
-    cursor.execute('SELECT DISTINCT status FROM ptaci ORDER BY status')
-    options['stavy'] = [row['status'] for row in cursor.fetchall() if row['status']]
+    cursor.execute('SELECT DISTINCT status_ohrozeni FROM ptaci ORDER BY status_ohrozeni')
+    options['stavy'] = [row['status_ohrozeni'] for row in cursor.fetchall() if row['status_ohrozeni']]
     
     return options
 

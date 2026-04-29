@@ -124,7 +124,7 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label for="typ_potravy">Potrava:</label>
+                    <label for="typ_potravy">Typ potravy:</label>
                     <select name="typ_potravy" id="typ_potravy">
                         <option value="">-- Vše --</option>
                         {% for p in filter_options.potravy %}
@@ -136,11 +136,11 @@
             
             <div class="filter-row">
                 <div class="filter-group">
-                    <label for="kontinent">Kontinent:</label>
-                    <select name="kontinent" id="kontinent">
+                    <label for="vyskyt_kontinent">Výskyt kontinent:</label>
+                    <select name="vyskyt_kontinent" id="vyskyt_kontinent">
                         <option value="">-- Vše --</option>
                         {% for k in filter_options.kontinenty %}
-                        <option value="{{ k }}" {% if params.get('kontinent') == k %}selected{% endif %}>{{ k }}</option>
+                        <option value="{{ k }}" {% if params.get('vyskyt_kontinent') == k %}selected{% endif %}>{{ k }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -155,11 +155,11 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label for="status">Status:</label>
-                    <select name="status" id="status">
+                    <label for="status_ohrozeni">Status ohrožení:</label>
+                    <select name="status_ohrozeni" id="status_ohrozeni">
                         <option value="">-- Vše --</option>
                         {% for s in filter_options.stavy %}
-                        <option value="{{ s }}" {% if params.get('status') == s %}selected{% endif %}>{{ s }}</option>
+                        <option value="{{ s }}" {% if params.get('status_ohrozeni') == s %}selected{% endif %}>{{ s }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -184,10 +184,10 @@
                         <option value="nazev" {% if razeni == 'nazev' %}selected{% endif %}>Název</option>
                         <option value="rad" {% if razeni == 'rad' %}selected{% endif %}>Řád</option>
                         <option value="celed" {% if razeni == 'celed' %}selected{% endif %}>Čeleď</option>
-                        <option value="delka" {% if razeni == 'delka' %}selected{% endif %}>Délka</option>
-                        <option value="rozpeti" {% if razeni == 'rozpeti' %}selected{% endif %}>Rozpětí</option>
-                        <option value="hmotnost" {% if razeni == 'hmotnost' %}selected{% endif %}>Hmotnost</option>
-                        <option value="snuska" {% if razeni == 'snuska' %}selected{% endif %}>Snůška</option>
+                        <option value="delka_cm" {% if razeni == 'delka_cm' %}selected{% endif %}>Délka</option>
+                        <option value="rozpeti_cm" {% if razeni == 'rozpeti_cm' %}selected{% endif %}>Rozpětí</option>
+                        <option value="hmotnost_g" {% if razeni == 'hmotnost_g' %}selected{% endif %}>Hmotnost</option>
+                        <option value="snuska_ks" {% if razeni == 'snuska_ks' %}selected{% endif %}>Snůška</option>
                     </select>
                 </div>
                 
@@ -233,14 +233,14 @@
                 <td>{{ ptak['vedecky_nazev'] }}</td>
                 <td>{{ ptak['rad'] }}</td>
                 <td>{{ ptak['celed'] }}</td>
-                <td>{{ ptak['delka'] }}</td>
-                <td>{{ ptak['rozpeti'] }}</td>
-                <td>{{ ptak['hmotnost'] }}</td>
-                <td>{{ ptak['status'] }}</td>
-                <td>{{ ptak['potrava'] }}</td>
+                <td>{{ ptak['delka_cm'] }}</td>
+                <td>{{ ptak['rozpeti_cm'] }}</td>
+                <td>{{ ptak['hmotnost_g'] }}</td>
+                <td>{{ ptak['status_ohrozeni'] }}</td>
+                <td>{{ ptak['typ_potravy'] }}</td>
                 <td>{% if ptak['migrace'] %}Ano{% else %}Ne{% endif %}</td>
-                <td>{{ ptak['kontinent'] }}</td>
-                <td>{{ ptak['snuska'] }}</td>
+                <td>{{ ptak['vyskyt_kontinent'] }}</td>
+                <td>{{ ptak['snuska_ks'] }}</td>
             </tr>
             {% else %}
             <tr>
