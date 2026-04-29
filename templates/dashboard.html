@@ -5,138 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Ptáci</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-            border-bottom: 3px solid #4CAF50;
-            padding-bottom: 10px;
-        }
-        .filter-form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .filter-form h2 {
-            margin-top: 0;
-        }
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .filter-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        .filter-group select,
-        .filter-group input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .stats-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .stat-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 0.9em;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-card .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        .chart-card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .chart-card h3 {
-            margin: 0 0 20px 0;
-            color: #333;
-        }
-        button, a.reset-btn {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 1em;
-            text-decoration: none;
-            display: inline-block;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        a.reset-btn {
-            background-color: #808080;
-        }
-        a.reset-btn:hover {
-            background-color: #707070;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: bold;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        tr:hover {
-            background-color: #f9f9f9;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>Dashboard Ptáci</h1>
@@ -369,6 +238,7 @@
         });
     </script>
     
+    <div class="table-wrapper">
     <table>
         <thead>
             <tr>
@@ -398,7 +268,20 @@
                 <td>{{ ptak['delka_cm'] }}</td>
                 <td>{{ ptak['rozpeti_cm'] }}</td>
                 <td>{{ ptak['hmotnost_g'] }}</td>
-                <td>{{ ptak['status_ohrozeni'] }}</td>
+                <td>
+                    {% set status = ptak['status_ohrozeni'] %}
+                    {% if status == 'Málo dotčený' %}
+                        <span class="badge badge-lc">{{ status }}</span>
+                    {% elif status == 'Téměř ohrožený' %}
+                        <span class="badge badge-to">{{ status }}</span>
+                    {% elif status == 'Zranitelný' %}
+                        <span class="badge badge-z">{{ status }}</span>
+                    {% elif status == 'Ohrožený' %}
+                        <span class="badge badge-o">{{ status }}</span>
+                    {% else %}
+                        <span class="badge">{{ status }}</span>
+                    {% endif %}
+                </td>
                 <td>{{ ptak['typ_potravy'] }}</td>
                 <td>{% if ptak['migrace'] %}Ano{% else %}Ne{% endif %}</td>
                 <td>{{ ptak['vyskyt_kontinent'] }}</td>
@@ -411,5 +294,6 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </body>
 </html>
