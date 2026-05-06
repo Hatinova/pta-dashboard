@@ -40,4 +40,16 @@ Po odeslání formuláře aplikace provede SQL dotaz typu `UPDATE ptaci SET ... 
 Součástí bude kontrola datových typů (např. čísla u `delka_cm`, `hmotnost_g`) a ošetření chyb (např. neplatný vstup nebo selhání databáze).  
 Po úspěšném uložení se zobrazí potvrzení a aktualizovaný záznam.
 
+## 3. Krok: Odebírání záznamů
+
+V této fázi bude přidána možnost mazání existujících záznamů z tabulky `ptaci`.  
+Uživatel bude moci vybrat konkrétní záznam (např. ze seznamu) a odstranit jej pomocí tlačítka „Smazat“.  
+
+Před samotným smazáním bude zobrazena potvrzovací výzva, aby nedošlo k nechtěnému odstranění dat.  
+
+Po potvrzení aplikace provede SQL dotaz typu `DELETE FROM ptaci WHERE id = ?`,  
+čímž dojde k trvalému odstranění záznamu z databáze.  
+
+Po úspěšném smazání se aktualizuje zobrazený seznam záznamů.  
+V případě chyby (např. neplatné `id` nebo problém s databází) aplikace zobrazí chybovou hlášku.
 
