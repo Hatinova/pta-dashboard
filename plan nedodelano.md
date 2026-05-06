@@ -53,3 +53,18 @@ Po potvrzení aplikace provede SQL dotaz typu `DELETE FROM ptaci WHERE id = ?`,
 Po úspěšném smazání se aktualizuje zobrazený seznam záznamů.  
 V případě chyby (např. neplatné `id` nebo problém s databází) aplikace zobrazí chybovou hlášku.
 
+## 4. Krok: přihlášení a povolení upravovat
+
+V této fázi bude aplikace upravena tak, aby umožňovala dvě úrovně přístupu: veřejný režim a režim přihlášeného uživatele.  
+
+Bez přihlášení bude možné aplikaci spustit a prohlížet databázi ptáků v režimu „jen pro čtení“.  
+Uživatel si bude moci zobrazit seznam záznamů a jejich detailní informace, ale nebude moci provádět žádné změny.  
+
+Po přihlášení se odemkne administrátorský režim, který umožní:
+- přidávání nových záznamů  
+- úpravu existujících záznamů  
+- mazání záznamů  
+
+Rozhraní bude dynamicky reagovat na stav přihlášení – tlačítka pro editaci, mazání a přidání budou viditelná a aktivní pouze pro přihlášené uživatele.  
+
+Neautorizovaný uživatel je nebude moci použít ani obejít, protože samotné databázové operace (INSERT, UPDATE, DELETE) budou podmíněny ověřením přihlášení v aplikaci.  
