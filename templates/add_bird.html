@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přidat ptáka - Dashboard Ptáci</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Přidat nového ptáka</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+        <form method="POST" action="/add_bird">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nazev">Název *</label>
+                    <input type="text" id="nazev" name="nazev" required maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label for="vedecky_nazev">Vědecký název *</label>
+                    <input type="text" id="vedecky_nazev" name="vedecky_nazev" required maxlength="255">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rad">Řád</label>
+                    <input type="text" id="rad" name="rad" maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label for="celed">Čeleď</label>
+                    <input type="text" id="celed" name="celed" maxlength="255">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="delka_cm">Délka (cm)</label>
+                    <input type="number" id="delka_cm" name="delka_cm" min="0" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="rozpeti_cm">Rozpětí (cm)</label>
+                    <input type="number" id="rozpeti_cm" name="rozpeti_cm" min="0" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="hmotnost_g">Hmotnost (g)</label>
+                    <input type="number" id="hmotnost_g" name="hmotnost_g" min="0" step="1">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status_ohrozeni">Status ohrožení</label>
+                    <select id="status_ohrozeni" name="status_ohrozeni">
+                        <option value="">-- Vyberte --</option>
+                        <option value="Málo dotčený">Málo dotčený</option>
+                        <option value="Téměř ohrožený">Téměř ohrožený</option>
+                        <option value="Zranitelný">Zranitelný</option>
+                        <option value="Ohrožený">Ohrožený</option>
+                        <option value="Kriticky ohrožený">Kriticky ohrožený</option>
+                        <option value="Vyhubený">Vyhubený</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="typ_potravy">Typ potravy</label>
+                    <input type="text" id="typ_potravy" name="typ_potravy" maxlength="255">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="migrace">Migrace</label>
+                    <select id="migrace" name="migrace">
+                        <option value="">-- Vyberte --</option>
+                        <option value="1">Ano (tažný)</option>
+                        <option value="0">Ne (netažný)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="vyskyt_kontinent">Výskyt kontinent</label>
+                    <input type="text" id="vyskyt_kontinent" name="vyskyt_kontinent" maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label for="snuska_ks">Snůška (ks)</label>
+                    <input type="number" id="snuska_ks" name="snuska_ks" min="0" step="0.1">
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit">Přidat záznam</button>
+                <a href="/" class="cancel-btn">Zrušit</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

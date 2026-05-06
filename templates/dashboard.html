@@ -10,6 +10,18 @@
 <body>
     <h1>Dashboard Ptáci</h1>
     
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
     <div class="filter-form">
         <h2>Filtry</h2>
         <form method="GET" action="/">
@@ -255,6 +267,7 @@
                 <th>Migrace</th>
                 <th>Kontinent</th>
                 <th>Snůška</th>
+                <th>Akce</th>
             </tr>
         </thead>
         <tbody>
@@ -286,14 +299,24 @@
                 <td>{% if ptak['migrace'] %}Ano{% else %}Ne{% endif %}</td>
                 <td>{{ ptak['vyskyt_kontinent'] }}</td>
                 <td>{{ ptak['snuska_ks'] }}</td>
+                <td>
+                    <a href="/edit_bird/{{ ptak['id'] }}" class="action-btn edit-btn" title="Upravit">✏️</a>
+                </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="13" style="text-align: center; padding: 20px;">Žádné ptáky neodpovídají kritériím filtrování.</td>
+                <td colspan="14" style="text-align: center; padding: 20px;">Žádné ptáky neodpovídají kritériím filtrování.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    
+    <!-- Tlačítko pro přidání nového ptáka -->
+    <div class="add-button-container">
+        <a href="/add_bird" class="add-button" title="Přidat nového ptáka">
+            <span>+</span>
+        </a>
     </div>
 </body>
 </html>

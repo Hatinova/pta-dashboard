@@ -1,8 +1,9 @@
-﻿from flask import Flask, render_template, request
+﻿from flask import Flask, render_template, request, flash, redirect, url_for
 import sqlite3
 import os
 
 app = Flask(__name__)
+app.secret_key = 'tajny-kluc-pro-ptaci-dashboard-2024'  # Přidáno pro flash messages
 
 # Povolené sloupce pro řazení (ochrana proti SQL injection)
 ALLOWED_SORT_COLUMNS = {
@@ -192,6 +193,184 @@ def dashboard():
                          graf_potrava_labels=graf_potrava_labels, graf_potrava_data=graf_potrava_data,
                          migrace_labels=migrace_labels, migrace_data=migrace_data,
                          graf_kontinent_labels=graf_kontinent_labels, graf_kontinent_data=graf_kontinent_data)
+
+@app.route('/add_bird', methods=['GET', 'POST'])
+def add_bird():
+    if request.method == 'POST':
+        # Získání dat z formuláře
+        nazev = request.form.get('nazev', '').strip()
+        vedecky_nazev = request.form.get('vedecky_nazev', '').strip()
+        rad = request.form.get('rad', '').strip()
+        celed = request.form.get('celed', '').strip()
+        delka_cm = request.form.get('delka_cm', '').strip()
+        rozpeti_cm = request.form.get('rozpeti_cm', '').strip()
+        hmotnost_g = request.form.get('hmotnost_g', '').strip()
+        status_ohrozeni = request.form.get('status_ohrozeni', '').strip()
+        typ_potravy = request.form.get('typ_potravy', '').strip()
+        migrace = request.form.get('migrace', '').strip()
+        vyskyt_kontinent = request.form.get('vyskyt_kontinent', '').strip()
+        snuska_ks = request.form.get('snuska_ks', '').strip()
+        
+        # Validace povinných polí
+        errors = []
+        if not nazev:
+            errors.append("Název je povinný.")
+        if not vedecky_nazev:
+            errors.append("Vědecký název je povinný.")
+        
+        # Validace číselných hodnot
+        try:
+            delka_cm_val = int(delka_cm) if delka_cm else None
+        except ValueError:
+            errors.append("Délka musí být celé číslo.")
+            
+        try:
+            rozpeti_cm_val = int(rozpeti_cm) if rozpeti_cm else None
+        except ValueError:
+            errors.append("Rozpětí musí být celé číslo.")
+            
+        try:
+            hmotnost_g_val = int(hmotnost_g) if hmotnost_g else None
+        except ValueError:
+            errors.append("Hmotnost musí být celé číslo.")
+            
+        try:
+            migrace_val = int(migrace) if migrace else None
+            if migrace_val is not None and migrace_val not in [0, 1]:
+                errors.append("Migrace musí být 0 nebo 1.")
+        except ValueError:
+            errors.append("Migrace musí být 0 nebo 1.")
+            
+        try:
+            snuska_ks_val = float(snuska_ks) if snuska_ks else None
+        except ValueError:
+            errors.append("Snůška musí být číslo.")
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('add_bird'))
+        
+        # Vložení do databáze
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute('''
+                INSERT INTO ptaci (nazev, vedecky_nazev, rad, celed, delka_cm, rozpeti_cm, hmotnost_g, 
+                                 status_ohrozeni, typ_potravy, migrace, vyskyt_kontinent, snuska_ks)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (nazev, vedecky_nazev, rad, celed, delka_cm_val, rozpeti_cm_val, hmotnost_g_val,
+                  status_ohrozeni, typ_potravy, migrace_val, vyskyt_kontinent, snuska_ks_val))
+            db.commit()
+            db.close()
+            
+            flash('Záznam byl úspěšně přidán.', 'success')
+            return redirect(url_for('dashboard'))
+            
+        except Exception as e:
+            flash(f'Chyba při ukládání: {str(e)}', 'error')
+            return redirect(url_for('add_bird'))
+    
+    # GET request - zobrazí formulář
+    return render_template('add_bird.html')
+
+@app.route('/edit_bird/<int:bird_id>', methods=['GET', 'POST'])
+def edit_bird(bird_id):
+    if request.method == 'POST':
+        # Získání dat z formuláře
+        nazev = request.form.get('nazev', '').strip()
+        vedecky_nazev = request.form.get('vedecky_nazev', '').strip()
+        rad = request.form.get('rad', '').strip()
+        celed = request.form.get('celed', '').strip()
+        delka_cm = request.form.get('delka_cm', '').strip()
+        rozpeti_cm = request.form.get('rozpeti_cm', '').strip()
+        hmotnost_g = request.form.get('hmotnost_g', '').strip()
+        status_ohrozeni = request.form.get('status_ohrozeni', '').strip()
+        typ_potravy = request.form.get('typ_potravy', '').strip()
+        migrace = request.form.get('migrace', '').strip()
+        vyskyt_kontinent = request.form.get('vyskyt_kontinent', '').strip()
+        snuska_ks = request.form.get('snuska_ks', '').strip()
+        
+        # Validace povinných polí
+        errors = []
+        if not nazev:
+            errors.append("Název je povinný.")
+        if not vedecky_nazev:
+            errors.append("Vědecký název je povinný.")
+        
+        # Validace číselných hodnot
+        try:
+            delka_cm_val = int(delka_cm) if delka_cm else None
+        except ValueError:
+            errors.append("Délka musí být celé číslo.")
+            
+        try:
+            rozpeti_cm_val = int(rozpeti_cm) if rozpeti_cm else None
+        except ValueError:
+            errors.append("Rozpětí musí být celé číslo.")
+            
+        try:
+            hmotnost_g_val = int(hmotnost_g) if hmotnost_g else None
+        except ValueError:
+            errors.append("Hmotnost musí být celé číslo.")
+            
+        try:
+            migrace_val = int(migrace) if migrace else None
+            if migrace_val is not None and migrace_val not in [0, 1]:
+                errors.append("Migrace musí být 0 nebo 1.")
+        except ValueError:
+            errors.append("Migrace musí být 0 nebo 1.")
+            
+        try:
+            snuska_ks_val = float(snuska_ks) if snuska_ks else None
+        except ValueError:
+            errors.append("Snůška musí být číslo.")
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('edit_bird', bird_id=bird_id))
+        
+        # Aktualizace v databázi
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute('''
+                UPDATE ptaci SET 
+                    nazev = ?, vedecky_nazev = ?, rad = ?, celed = ?, 
+                    delka_cm = ?, rozpeti_cm = ?, hmotnost_g = ?, 
+                    status_ohrozeni = ?, typ_potravy = ?, migrace = ?, 
+                    vyskyt_kontinent = ?, snuska_ks = ?
+                WHERE id = ?
+            ''', (nazev, vedecky_nazev, rad, celed, delka_cm_val, rozpeti_cm_val, hmotnost_g_val,
+                  status_ohrozeni, typ_potravy, migrace_val, vyskyt_kontinent, snuska_ks_val, bird_id))
+            db.commit()
+            db.close()
+            
+            flash('Záznam byl úspěšně upraven.', 'success')
+            return redirect(url_for('dashboard'))
+            
+        except Exception as e:
+            flash(f'Chyba při ukládání: {str(e)}', 'error')
+            return redirect(url_for('edit_bird', bird_id=bird_id))
+    
+    # GET request - načtení dat pro úpravu
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM ptaci WHERE id = ?', (bird_id,))
+        bird = cursor.fetchone()
+        db.close()
+        
+        if not bird:
+            flash('Záznam nebyl nalezen.', 'error')
+            return redirect(url_for('dashboard'))
+        
+        return render_template('edit_bird.html', bird=bird)
+        
+    except Exception as e:
+        flash(f'Chyba při načítání záznamu: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
