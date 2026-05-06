@@ -1,9 +1,51 @@
-﻿from flask import Flask, render_template, request, flash, redirect, url_for
+﻿from flask import Flask, render_template, request, flash, redirect, url_for, session
 import sqlite3
 import os
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'tajny-kluc-pro-ptaci-dashboard-2024'  # Přidáno pro flash messages
+
+# Jednoduché přihlašovací údaje (pro demonstraci)
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = 'password'
+
+def is_logged_in():
+    """Kontroluje, zda je uživatel přihlášen."""
+    return session.get('logged_in', False)
+
+def require_login():
+    """Dekorátor pro kontrolu přihlášení."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not is_logged_in():
+                flash('Pro tuto akci se musíte přihlásit.', 'error')
+                return redirect(url_for('login'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            flash('Úspěšně přihlášeno.', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Neplatné přihlašovací údaje.', 'error')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('Úspěšně odhlášeno.', 'success')
+    return redirect(url_for('dashboard'))
 
 # Povolené sloupce pro řazení (ochrana proti SQL injection)
 ALLOWED_SORT_COLUMNS = {
@@ -192,9 +234,11 @@ def dashboard():
                          graf_rad_labels=graf_rad_labels, graf_rad_data=graf_rad_data,
                          graf_potrava_labels=graf_potrava_labels, graf_potrava_data=graf_potrava_data,
                          migrace_labels=migrace_labels, migrace_data=migrace_data,
-                         graf_kontinent_labels=graf_kontinent_labels, graf_kontinent_data=graf_kontinent_data)
+                         graf_kontinent_labels=graf_kontinent_labels, graf_kontinent_data=graf_kontinent_data,
+                         logged_in=is_logged_in())
 
 @app.route('/add_bird', methods=['GET', 'POST'])
+@require_login()
 def add_bird():
     if request.method == 'POST':
         # Získání dat z formuláře
@@ -275,6 +319,7 @@ def add_bird():
     return render_template('add_bird.html')
 
 @app.route('/edit_bird/<int:bird_id>', methods=['GET', 'POST'])
+@require_login()
 def edit_bird(bird_id):
     if request.method == 'POST':
         # Získání dat z formuláře
@@ -373,6 +418,7 @@ def edit_bird(bird_id):
         return redirect(url_for('dashboard'))
 
 @app.route('/delete_bird/<int:bird_id>', methods=['POST'])
+@require_login()
 def delete_bird(bird_id):
     try:
         db = get_db()
