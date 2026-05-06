@@ -10,6 +10,17 @@
 <body>
     <h1>Dashboard Ptáci</h1>
     
+    <!-- Přihlašovací status -->
+    <div class="auth-status">
+        {% if logged_in %}
+            <span class="status-logged-in">Přihlášen jako administrátor</span>
+            <a href="/logout" class="auth-btn logout-btn">Odhlásit se</a>
+        {% else %}
+            <span class="status-logged-out">Režim jen pro čtení</span>
+            <a href="/login" class="auth-btn login-btn">Přihlásit se</a>
+        {% endif %}
+    </div>
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="flash-messages">
@@ -300,10 +311,14 @@
                 <td>{{ ptak['vyskyt_kontinent'] }}</td>
                 <td>{{ ptak['snuska_ks'] }}</td>
                 <td>
+                    {% if logged_in %}
                     <a href="/edit_bird/{{ ptak['id'] }}" class="action-btn edit-btn" title="Upravit">✏️</a>
                     <form method="POST" action="/delete_bird/{{ ptak['id'] }}" style="display: inline;" onsubmit="return confirm('Opravdu chcete smazat tento záznam?')">
                         <button type="submit" class="action-btn delete-btn" title="Smazat" style="border: none; background: none; padding: 6px 10px; cursor: pointer;">🗑️</button>
                     </form>
+                    {% else %}
+                    <span class="action-disabled" title="Přihlaste se pro úpravu">🔒</span>
+                    {% endif %}
                 </td>
             </tr>
             {% else %}
@@ -316,10 +331,12 @@
     </div>
     
     <!-- Tlačítko pro přidání nového ptáka -->
+    {% if logged_in %}
     <div class="add-button-container">
         <a href="/add_bird" class="add-button" title="Přidat nového ptáka">
             <span>+</span>
         </a>
     </div>
+    {% endif %}
 </body>
 </html>
