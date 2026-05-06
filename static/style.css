@@ -535,6 +535,16 @@ tbody tr:hover {
     background-color: #1b4332;
     transform: scale(1.1);
 }
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+    transform: scale(1.1);
+}
 @media (max-width: 768px) {
     .add-button-container {
         bottom: 20px;

@@ -301,6 +301,9 @@
                 <td>{{ ptak['snuska_ks'] }}</td>
                 <td>
                     <a href="/edit_bird/{{ ptak['id'] }}" class="action-btn edit-btn" title="Upravit">✏️</a>
+                    <form method="POST" action="/delete_bird/{{ ptak['id'] }}" style="display: inline;" onsubmit="return confirm('Opravdu chcete smazat tento záznam?')">
+                        <button type="submit" class="action-btn delete-btn" title="Smazat" style="border: none; background: none; padding: 6px 10px; cursor: pointer;">🗑️</button>
+                    </form>
                 </td>
             </tr>
             {% else %}

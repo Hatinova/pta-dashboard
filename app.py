@@ -372,5 +372,21 @@ def edit_bird(bird_id):
         flash(f'Chyba při načítání záznamu: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
 
+@app.route('/delete_bird/<int:bird_id>', methods=['POST'])
+def delete_bird(bird_id):
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('DELETE FROM ptaci WHERE id = ?', (bird_id,))
+        db.commit()
+        db.close()
+        
+        flash('Záznam byl úspěšně smazán.', 'success')
+        return redirect(url_for('dashboard'))
+        
+    except Exception as e:
+        flash(f'Chyba při mazání záznamu: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
 if __name__ == '__main__':
     app.run(debug=True)
